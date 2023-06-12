@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <?php
 include("departureController.php");
-    $departureController = new departureController();
+$departureController = new departureController();
+$currentTime = date('H:i');
 ?>
 
 <html>
@@ -10,20 +11,19 @@ include("departureController.php");
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <h1>Abfahrten</h1>
-    <?php
-    //var_dump($departureController->findNextDeparturesByTime("11:03:00"));
-    foreach ($departureController->findNextDeparturesByTime("11:03:00") as $departure)
-    {
-        echo $departure[1];
-        echo " um ";
-        echo $departure[2];
-        echo "<br>";
-
-    }
-
-    ?>
+<h1>Abfahrten ab <?php echo $currentTime?></h1>
+<ul>
+<?php
+foreach ($departureController->findNextDeparturesAfter($currentTime) as $departure)
+{
+    echo '<li>';
+    echo $departure[1];
+    echo " um ";
+    echo $departure[2];
+    echo "</li>";
+}
+?>
+</ul>
 </body>
 </html>
 
