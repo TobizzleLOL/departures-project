@@ -2,7 +2,9 @@
 <?php
 include("departureController.php");
 $departureController = new departureController();
+$departureController->saveDeparturesFromJson();
 $currentTime = date('H:i');
+
 ?>
 
 <html>
@@ -14,7 +16,7 @@ $currentTime = date('H:i');
 <h1>Abfahrten ab <?php echo $currentTime?></h1>
 <ul>
 <?php
-foreach ($departureController->findNextDeparturesAfter($currentTime) as $departure)
+foreach ($departureController->findNextDepartures($currentTime) as $departure)
 {
     echo '<li>';
     echo $departure[1];
