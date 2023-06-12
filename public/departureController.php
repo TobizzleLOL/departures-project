@@ -6,10 +6,10 @@ $password = 'root';
 $conn = new PDO($dsn, $username, $password);
 class departureController
 {
-    function findNextDepartureByTime( $time)
+    function findNextDeparturesByTime($time)
     {
         global $conn;
-        $stmt = $conn->prepare('SELECT * FROM departure WHERE time=:time');
+        $stmt = $conn->prepare('SELECT * FROM departure WHERE time>:time');
         $stmt->bindParam(':time', $time);
         $stmt->execute();
 
