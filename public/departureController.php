@@ -31,19 +31,21 @@ class departureController
         $domDoc->loadHTML($rawXmlSting, LIBXML_NOERROR);
         $domDoc->saveHTML();
 
+        $this->saveToFile($domDoc);
+
         return $domDoc;
     }
 
     function getDeparturesFromXmlFile()
     {
-        $rawXmlSting = file_get_contents('Departures.xml', false);
-        $domDoc = new DOMDocument();
-        $domDoc->loadHTML($rawXmlSting, LIBXML_NOERROR);
-        $domDoc->saveHTML();
+        $rawXmlSting = file_get_contents('Departures.html');
+        $xml = simplexml_load_string($rawXmlSting);
+        $json = json_encode($xml);
+        $array = json_decode($json,TRUE);
 
-        return $domDoc;
+        return $array['body']['div']['table'][1]['tr'];
     }
     function saveToFile($object){
-        $object->save('Departures.xml');
+        $object->save('Departures.html');
     }
 }

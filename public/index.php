@@ -2,7 +2,10 @@
 <?php
 include("departureController.php");
 $departureController = new departureController();
-$departureController->saveDeparturesFromJson();
+//$domDoc = $departureController->getDeparturesFromWeb('https://www.kvb.koeln/generated/?aktion=show&code=7');
+$domDoc = $departureController->getDeparturesFromXmlFile();
+var_dump($domDoc);
+date_default_timezone_set('Europe/Berlin');
 $currentTime = date('H:i');
 
 ?>
