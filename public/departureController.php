@@ -16,10 +16,38 @@ class departureController
             $departureArray = $this->getDeparturesFromXmlFile();
             $this->saveDeparturesToDb($departureArray);
     }
+    public function view()
+    {
+        global $currentTime;
+
+        echo "<table>
+    <tr>
+        <th>Line</th>
+        <th>Time</th>
+    </tr>";
+
+
+        foreach ($this->findDepartures($currentTime) as $departure)
+        {
+            echo '<tr>';
+            echo '<td>'. $departure[3] .'</td>';         //line
+            echo '<td>'. substr((string)$departure[2], 0, -3) .'</td>'; //time
+            echo '</tr>';
+        }
+
+    }
+    public function check()
+    {
+        global $currentTime;
+        if(count($this->findDepartures($currentTime))<10)
+        {
+            $this->update();
+        }
+    }
     public function findDepartures($time)
     {
         global $conn;
-        $stmt = $conn->prepare('SELECT * FROM departure WHERE time>:time');
+        $stmt = $conn->prepare('SELECT * FROM departure WHERE time>=:time');
         $stmt->bindParam(':time', $time);
         $stmt->execute();
 
