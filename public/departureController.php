@@ -24,6 +24,7 @@ class departureController
     <tr>
         <th>Line</th>
         <th>Time</th>
+        <th>Direction</th>
     </tr>";
 
 
@@ -32,6 +33,7 @@ class departureController
             echo '<tr>';
             echo '<td>'. $departure[3] .'</td>';         //line
             echo '<td>'. substr((string)$departure[2], 0, -3) .'</td>'; //time
+            echo '<td>'. $departure[4] .'</td>'; //direction
             echo '</tr>';
         }
 
@@ -92,15 +94,17 @@ class departureController
         $data[0] = ['td'=>['||','||','||']];
 
         $station = 'Appellhofplatz';
-        $stmt = $conn->prepare("INSERT INTO departure(station, time, line) VALUES(:station, :time, :line)");
+        $stmt = $conn->prepare("INSERT INTO departure(station, time, line, direction) VALUES(:station, :time, :line, :direction)");
         foreach($data as $departure) {
 
             $minutes = (int)substr($departure['td'][2], 0, -7);
             $time  = date('H:i', strtotime('+'.$minutes.' minutes'));
             $line = (int)substr($departure['td'][0], 2, -4);
+            $direction = $departure['td'][1];
             $stmt->bindParam(':station', $station);
             $stmt->bindParam(':time', $time);
             $stmt->bindParam(':line', $line);
+            $stmt->bindParam(':direction', $direction);
             $stmt->execute();
         }
     }
