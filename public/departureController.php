@@ -5,12 +5,13 @@ $password = 'db';
 
 
 $conn = new PDO($dsn, $username, $password);
+date_default_timezone_set('Europe/Berlin');
 class departureController
 {
-    function findNextDepartures($time)
+    function findDepartures($time)
     {
         global $conn;
-        $stmt = $conn->prepare('SELECT * FROM departure WHERE time>:time LIMIT 10');
+        $stmt = $conn->prepare('SELECT * FROM departure WHERE time>:time');
         $stmt->bindParam(':time', $time);
         $stmt->execute();
 
@@ -47,5 +48,29 @@ class departureController
     }
     function saveToFile($object){
         $object->save('Departures.html');
+    }
+
+    function saveDeparturesToDb($data){
+        global $conn;
+        $this->truncateDb('departure');
+        $data[0] = ['td'=>['||','||','||']];
+
+        $station = 'Appellhofplatz';
+        $stmt = $conn->prepare("INSERT INTO departure(station, time, line) VALUES(:station, :time, :line)");
+        foreach($data as $departure) {
+
+            $minutes = (int)substr($departure['td'][2], 0, -7);
+            $time  = date('H:i', strtotime('+'.$minutes.' minutes'));
+            $line = (int)substr($departure['td'][0], 2, -4);
+            $stmt->bindParam(':station', $station);
+            $stmt->bindParam(':time', $time);
+            $stmt->bindParam(':line', $line);
+            $stmt->execute();
+        }
+    }
+    function truncateDb($db){
+        global $conn;
+        $stmt = $conn->prepare("TRUNCATE ". $db);
+        $stmt->execute();
     }
 }

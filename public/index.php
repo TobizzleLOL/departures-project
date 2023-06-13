@@ -2,11 +2,12 @@
 <?php
 include("departureController.php");
 $departureController = new departureController();
-//$domDoc = $departureController->getDeparturesFromWeb('https://www.kvb.koeln/generated/?aktion=show&code=7');
-$domDoc = $departureController->getDeparturesFromXmlFile();
-var_dump($domDoc);
+$domDoc = $departureController->getDeparturesFromWeb('https://www.kvb.koeln/generated/?aktion=show&code=7');
+$departureArray = $departureController->getDeparturesFromXmlFile();
+$departureController->saveDeparturesToDb($departureArray);
 date_default_timezone_set('Europe/Berlin');
 $currentTime = date('H:i');
+
 
 ?>
 
@@ -16,16 +17,15 @@ $currentTime = date('H:i');
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Abfahrten ab <?php echo $currentTime?></h1>
+<h1>Abfahrten Apellhofplatz <?php echo $currentTime?></h1>
 <ul>
 <?php
-foreach ($departureController->findNextDepartures($currentTime) as $departure)
+foreach ($departureController->findDepartures($currentTime) as $departure)
 {
     echo '<li>';
-    echo $departure[1];
-    echo " um ";
-    echo $departure[2];
-    echo "</li>";
+    echo "linie ". $departure[3];         //line
+    echo " at ". substr((String)$departure[2], 0, -3); //time
+    echo '</li>';
 }
 ?>
 </ul>
