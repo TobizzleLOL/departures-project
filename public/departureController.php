@@ -8,7 +8,15 @@ $conn = new PDO($dsn, $username, $password);
 date_default_timezone_set('Europe/Berlin');
 class departureController
 {
-    function findDepartures($time)
+
+    public function update()
+    {
+            $domDoc = $this->getDeparturesFromWeb('https://www.kvb.koeln/generated/?aktion=show&code=7');
+            $this->saveToFile($domDoc);
+            $departureArray = $this->getDeparturesFromXmlFile();
+            $this->saveDeparturesToDb($departureArray);
+    }
+    public function findDepartures($time)
     {
         global $conn;
         $stmt = $conn->prepare('SELECT * FROM departure WHERE time>:time');
@@ -18,7 +26,7 @@ class departureController
         return $stmt->fetchAll();
     }
 
-    function getDeparturesFromWeb($url)
+    private function getDeparturesFromWeb($url)
     {
         $context = [
             'http' => [
@@ -32,12 +40,10 @@ class departureController
         $domDoc->loadHTML($rawXmlSting, LIBXML_NOERROR);
         $domDoc->saveHTML();
 
-        $this->saveToFile($domDoc);
-
         return $domDoc;
     }
 
-    function getDeparturesFromXmlFile()
+    private function getDeparturesFromXmlFile()
     {
         $rawXmlSting = file_get_contents('Departures.html');
         $xml = simplexml_load_string($rawXmlSting);
@@ -46,11 +52,13 @@ class departureController
 
         return $array['body']['div']['table'][1]['tr'];
     }
-    function saveToFile($object){
+    private function saveToFile($object)
+    {
         $object->save('Departures.html');
     }
 
-    function saveDeparturesToDb($data){
+    private function saveDeparturesToDb($data)
+    {
         global $conn;
         $this->truncateDb('departure');
         $data[0] = ['td'=>['||','||','||']];
@@ -68,7 +76,8 @@ class departureController
             $stmt->execute();
         }
     }
-    function truncateDb($db){
+    private function truncateDb($db)
+    {
         global $conn;
         $stmt = $conn->prepare("TRUNCATE ". $db);
         $stmt->execute();
