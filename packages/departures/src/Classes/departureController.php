@@ -2,7 +2,9 @@
 
 namespace Tobizzlelol\Departures\Classes;
 
-use Classes\DOMDocument;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 date_default_timezone_set('Europe/Berlin');
 
@@ -18,32 +20,26 @@ class departureController
 
     public function update()
     {
-        $domDoc = $this->getDeparturesFromWeb('https://www.kvb.koeln/generated/?aktion=show&code=7');
+        $domDoc = $this->getDeparturesFromWeb('https://www.kvb.koeln/generated/?aktion=show&code=336');
         $this->saveToFile($domDoc);
         $departureArray = $this->getDeparturesFromXmlFile();
         $this->saveDeparturesToDb($departureArray);
     }
 
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     public function view()
     {
+        $loader = new \Twig\Loader\FilesystemLoader(__DIR__. '/../../resources');
+        //@todo
+        $twig = new \Twig\Environment($loader);
+        $template = $twig->load('templates/default.html');
         global $currentTime;
 
-        echo "<table>
-    <tr>
-        <th>Time</th>
-        <th>Line</th>
-        <th>Direction</th>
-    </tr>";
-
-
-        foreach ($this->findDepartures($currentTime) as $departure) {
-            echo '<tr>';
-            echo '<td>' . substr((string)$departure[2], 0, -3) . '</td>'; //time
-            echo '<td>' . $departure[3] . '</td>';         //line
-            echo '<td>' . $departure[4] . '</td>'; //direction
-            echo '</tr>';
-        }
-
+        echo $template->render( ['departures' => $this->findDepartures($currentTime)]);
     }
 
     public function check()
@@ -82,7 +78,7 @@ class departureController
 
     private function getDeparturesFromXmlFile()
     {
-        $rawXmlSting = file_get_contents('../packages/departures/resources/Departures.html');
+        $rawXmlSting = file_get_contents('packages/departures/resources/Departures.html');
         $xml = simplexml_load_string($rawXmlSting);
         $json = json_encode($xml);
         $array = json_decode($json, TRUE);

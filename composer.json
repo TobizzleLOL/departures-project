@@ -1,0 +1,12 @@
+{
+  "repositories": [
+    {
+      "type": "path",
+      "url": "packages/*"
+    }
+  ],
+  "require": {
+    "tobizzlelol/departures": "*"
+  },
+  "minimum-stability": "alpha"
+}
