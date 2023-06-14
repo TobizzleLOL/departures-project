@@ -30,16 +30,16 @@ class departureController
 
         echo "<table>
     <tr>
-        <th>Line</th>
         <th>Time</th>
+        <th>Line</th>
         <th>Direction</th>
     </tr>";
 
 
         foreach ($this->findDepartures($currentTime) as $departure) {
             echo '<tr>';
-            echo '<td>' . $departure[3] . '</td>';         //line
             echo '<td>' . substr((string)$departure[2], 0, -3) . '</td>'; //time
+            echo '<td>' . $departure[3] . '</td>';         //line
             echo '<td>' . $departure[4] . '</td>'; //direction
             echo '</tr>';
         }
